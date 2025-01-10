@@ -176,16 +176,16 @@ Public Sub setTheme(Theme As AS_WheelDateTimePicker_Theme)
 	xiv_RefreshImage.SetBitmap(mBase.Snapshot)
 	xiv_RefreshImage.SetVisibleAnimated(0,True)
 	
+	xpnl_LoadingPanel.Color = Theme.BackgroundColor
 	setBackgroundColor(Theme.BackgroundColor)
 	setSelectorColor(Theme.SelectorColor)
 	setFadeColor(Theme.FadeColor)
 	setDisabledTextColor(Theme.DisabledTextColor)
 	setTextColor(Theme.TextColor)
 	
-	Sleep(0)
 	Refresh
 	
-	Sleep(250)
+	If m_ThemeChangeTransition = "Fade" Then Sleep(250)
 	
 	Select m_ThemeChangeTransition
 		Case "None"
@@ -607,6 +607,8 @@ End Sub
 
 Public Sub setBackgroundColor(Color As Int)
 	m_BackgroundColor = Color
+	mBase.Color = Color
+	xpnl_WheelBackground.Color = Color
 	xwp_Wheel.SeperatorProperties.BackgroundColor = m_BackgroundColor
 	xwp_Wheel.BackgroundColor = m_BackgroundColor
 	Dim ItemTextProperties As ASWheelPicker_ItemTextProperties = xwp_Wheel.ItemTextProperties
