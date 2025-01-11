@@ -67,6 +67,10 @@ V1.16
 		-New get Theme_Light
 	-New Designer Property ThemeChangeTransition
 		-Default: Fade
+V1.17
+	-New all designer properties, now as get and set too
+	-New designer property descriptions
+	-BugFixes
 #End If
 
 #DesignerProperty: Key: ThemeChangeTransition, DisplayName: ThemeChangeTransition, FieldType: String, DefaultValue: Fade, List: None|Fade
@@ -74,11 +78,11 @@ V1.16
 
 #DesignerProperty: Key: TodayText, DisplayName: Today Text, FieldType: String, DefaultValue: Today
 
-#DesignerProperty: Key: TimeDivider, DisplayName: TimeDivider, FieldType: Boolean, DefaultValue: False, Description: Example of a boolean property.
-#DesignerProperty: Key: TimeUnit, DisplayName: Time Unit, FieldType: Boolean, DefaultValue: False, Description: Example of a boolean property.
-#DesignerProperty: Key: AMPM, DisplayName: AM/PM, FieldType: Boolean, DefaultValue: False, Description: Example of a boolean property.
-#DesignerProperty: Key: Date, DisplayName: Date, FieldType: Boolean, DefaultValue: False, Description: Example of a boolean property.
-#DesignerProperty: Key: WeekDays, DisplayName: Week Days, FieldType: Boolean, DefaultValue: True, Description: Example of a boolean property.
+#DesignerProperty: Key: TimeDivider, DisplayName: TimeDivider, FieldType: Boolean, DefaultValue: True, Description: The separator between hour and minute is usually a colon ( : )
+#DesignerProperty: Key: TimeUnit, DisplayName: Time Unit, FieldType: Boolean, DefaultValue: True, Description: Display time unit (12hour 05 min) can be changed with the HourShort and MinuteShort property
+#DesignerProperty: Key: AMPM, DisplayName: AM/PM, FieldType: Boolean, DefaultValue: False, Description: Show the AM and PM column
+#DesignerProperty: Key: Date, DisplayName: Date, FieldType: Boolean, DefaultValue: False, Description: Show the date column in the TimePicker
+'#DesignerProperty: Key: WeekDays, DisplayName: Week Days, FieldType: Boolean, DefaultValue: True, Description: Example of a boolean property.
 
 #DesignerProperty: Key: MinuteShort, DisplayName: Minute Short, FieldType: String, DefaultValue: min
 #DesignerProperty: Key: HourShort, DisplayName: Hour Short, FieldType: String, DefaultValue: hour
@@ -122,8 +126,8 @@ Sub Class_Globals
 	Private m_TimeUnit As Boolean
 	Private m_TimeDivider As Boolean
 	Private m_AMPM As Boolean
-	Private m_Date As Boolean
-	Private m_WeekDays As Boolean
+	Private m_ShowDate As Boolean
+'	Private m_WeekDays As Boolean
 	Private m_MinuteSteps As Int
 	Private m_HapticFeedback As Boolean
 	Private m_BackgroundColor As Int
@@ -136,6 +140,7 @@ Sub Class_Globals
 	Private m_Hour,m_Minute As Int = 0
 	Private m_MinDate,m_MaxDate As Long
 	Private m_DateTextOrder As B4XOrderedMap
+	Private isDateCreated As Boolean = False
 	
 	Private xiv_RefreshImage As B4XView
 	
@@ -236,8 +241,8 @@ Private Sub IniProps(Props As Map)
 	m_TimeUnit = Props.Get("TimeUnit")
 	m_TimeDivider = Props.GetDefault("TimeDivider",False)
 	m_AMPM = Props.Get("AMPM")
-	m_Date = Props.Get("Date")
-	m_WeekDays = Props.Get("WeekDays")
+	m_ShowDate = Props.Get("Date")
+'	m_WeekDays = Props.Get("WeekDays")
 	m_MinuteShort = Props.Get("MinuteShort")
 	m_HourShort = Props.Get("HourShort")
 	m_HapticFeedback = Props.GetDefault("HapticFeedback",False)
@@ -271,11 +276,13 @@ Private Sub Base_Resize (Width As Double, Height As Double)
 	xpnl_LoadingPanel.SetLayoutAnimated(0,0,0,Width,Height)
 	xpnl_WheelBackground.SetLayoutAnimated(0,0,0,Width,Height)
 	SelectorDesign
+	xwp_Wheel.Base_Resize(Width,Height)
 End Sub
 
 Private Sub SelectorDesign
-	xwp_Wheel.SelectorPanel.SetColorAndBorder(m_SelectorColor,0,0,5dip)
-	xwp_Wheel.SelectorPanel.SetLayoutAnimated(0,5dip,xwp_Wheel.SelectorPanel.Top,mBase.Width - 10dip,xwp_Wheel.SelectorPanel.Height)
+	xwp_Wheel.SelectionBarColor = m_SelectorColor
+'	xwp_Wheel.SelectorPanel.SetColorAndBorder(m_SelectorColor,0,0,5dip)
+'	xwp_Wheel.SelectorPanel.SetLayoutAnimated(0,5dip,xwp_Wheel.SelectorPanel.Top,mBase.Width - 10dip,xwp_Wheel.SelectorPanel.Height)
 End Sub
 
 Private Sub CreateWheelPicker
@@ -325,7 +332,7 @@ Private Sub FillWheelPicker
 		Next
 	
 		'Date
-		If m_Date = True Then
+		If m_ShowDate = True Then
 			Wait For (AddDate2TimePicker) Complete (Result As Boolean)
 		End If
 	
@@ -345,12 +352,12 @@ Private Sub FillWheelPicker
 			
 			tmp_lst.Add(Item)
 		Next
-		xwp_Wheel.SetItems(IIf(m_Date,1,0),tmp_lst)
+		xwp_Wheel.SetItems(IIf(m_ShowDate,1,0),tmp_lst)
 		
 		If m_TimeDivider Then
 			xwp_Wheel.SeperatorProperties.TextAlignment_Horizontal = "CENTER"
 			xwp_Wheel.SeperatorProperties.TextFont = xui.CreateDefaultBoldFont(18)
-			xwp_Wheel.SetSeperator(IIf(m_Date,1,0),50dip,":")
+			xwp_Wheel.SetSeperator(IIf(m_ShowDate,1,0),50dip,":")
 			xwp_Wheel.SeperatorProperties.TextFont = xui.CreateDefaultFont(12)
 		End If
 		
@@ -377,25 +384,25 @@ Private Sub FillWheelPicker
 				tmp_lst.Add(Item)
 			End If
 		Next
-		xwp_Wheel.SetItems(IIf(m_Date,2,1),tmp_lst)
+		xwp_Wheel.SetItems(IIf(m_ShowDate,2,1),tmp_lst)
 	
 		'AM and PM
 		If m_AMPM = True Then
-			xwp_Wheel.SetItems(IIf(m_Date,3,2),Array As String("AM","PM"))
+			xwp_Wheel.SetItems(IIf(m_ShowDate,3,2),Array As String("AM","PM"))
 		End If
 	
 		'Space between Hour and Minutes
 		
 		If m_TimeUnit = True Then
 			xwp_Wheel.SeperatorProperties.TextAlignment_Horizontal = "LEFT"
-			xwp_Wheel.SetSeperator(IIf(m_Date,1,0),MeasureTextWidth(" " & m_HourShort,xwp_Wheel.ItemTextProperties.TextFont) + 5dip," " & m_HourShort)
+			xwp_Wheel.SetSeperator(IIf(m_ShowDate,1,0),MeasureTextWidth(" " & m_HourShort,xwp_Wheel.ItemTextProperties.TextFont) + 5dip," " & m_HourShort)
 			
 			Dim MinuteSeperatorWidth As Float = MeasureTextWidth(m_MinuteShort,xwp_Wheel.ItemTextProperties.TextFont)
 			MinuteSeperatorWidth = (mBase.Width/xwp_Wheel.NumberOfColumns)/2
 			
 			
 			
-			xwp_Wheel.SetSeperator(IIf(m_Date,2,1),MinuteSeperatorWidth," " & m_MinuteShort)
+			xwp_Wheel.SetSeperator(IIf(m_ShowDate,2,1),MinuteSeperatorWidth," " & m_MinuteShort)
 		Else
 '			xwp_Wheel.AddSeperator(1,10dip,"")
 		End If
@@ -414,12 +421,12 @@ Private Sub FillWheelPicker
 		#End If
 		
 		If m_AMPM And m_Hour > 12 Then
-			xwp_Wheel.SelectRow2(IIf(m_Date,1,0),m_Hour-12,False)
-			xwp_Wheel.SelectRow(IIf(m_Date,3,2),1,False)
+			xwp_Wheel.SelectRow2(IIf(m_ShowDate,1,0),m_Hour-12,False)
+			xwp_Wheel.SelectRow(IIf(m_ShowDate,3,2),1,False)
 		Else
-			xwp_Wheel.SelectRow2(IIf(m_Date,1,0),m_Hour,False)
+			xwp_Wheel.SelectRow2(IIf(m_ShowDate,1,0),m_Hour,False)
 		End If
-		xwp_Wheel.SelectRow2(IIf(m_Date,2,1),m_Minute,False)
+		xwp_Wheel.SelectRow2(IIf(m_ShowDate,2,1),m_Minute,False)
 		
 	Else
 		
@@ -431,7 +438,7 @@ Private Sub FillWheelPicker
 	
 	SelectorDesign
 	
-'	If (m_PickerType = "TimePicker" And m_Date) Or m_PickerType = "DatePicker"  Then
+'	If (m_PickerType = "TimePicker" And m_ShowDate) Or m_PickerType = "DatePicker"  Then
 '		Sleep(250)
 '	Else
 '		Sleep(250)
@@ -441,7 +448,6 @@ Private Sub FillWheelPicker
 #Else
 	Sleep(250)
 #End If
-
 	xpnl_LoadingPanel.SetVisibleAnimated(250,False)
 End Sub
 
@@ -503,12 +509,12 @@ Private Sub AddDatePicker
 	Loop
 
 	#Else
-		xwp_Wheel.SelectRow(1,DateTime.GetDayOfMonth(DateTime.Now)-1,False)
+		xwp_Wheel.SelectRow(1,DateTime.GetDayOfMonth(m_StartDate)-1,False)
 	#End If
 	
-	xwp_Wheel.SelectRow2(0,DateTime.GetMonth(DateTime.Now),False)
-	xwp_Wheel.SelectRow2(2,DateTime.GetYear(DateTime.Now),True)
-	
+	xwp_Wheel.SelectRow2(0,DateTime.GetMonth(m_StartDate),False)
+	xwp_Wheel.SelectRow2(2,DateTime.GetYear(m_StartDate),False)
+	isDateCreated = True
 End Sub
 
 Private Sub AddDate2TimePicker As ResumableSub
@@ -573,6 +579,7 @@ Private Sub AddDate2TimePicker As ResumableSub
 		'#End If
 	
 	xwp_Wheel.SelectRow(ListIndex,StartIndex,False)
+	isDateCreated = True
 Return True
 	
 End Sub
@@ -735,14 +742,14 @@ Public Sub setHour(Hour As Int)
 			
 			If Hour > 12 Then
 				Hour = Hour - 12
-				xwp_Wheel.SelectRow(IIf(m_Date,3,2),1,False)
+				xwp_Wheel.SelectRow(IIf(m_ShowDate,3,2),1,False)
 				Else
-				xwp_Wheel.SelectRow(IIf(m_Date,3,2),0,False)
+				xwp_Wheel.SelectRow(IIf(m_ShowDate,3,2),0,False)
 			End If
 			
 		End If
 		
-		xwp_Wheel.SelectRow(IIf(m_Date,1,0),Hour,False)
+		xwp_Wheel.SelectRow(IIf(m_ShowDate,1,0),Hour,False)
 	End If
 End Sub
 
@@ -757,33 +764,42 @@ Public Sub setMinute(Minute As Int)
 		#If Debug
 		Sleep(0)
 		#End If
-		xwp_Wheel.SelectRow2(IIf(m_Date,2,1),m_Minute,False)
+		xwp_Wheel.SelectRow2(IIf(m_ShowDate,2,1),m_Minute,False)
 		
 	End If
 End Sub
 
 Public Sub setDate(Date As Long)
-	If m_PickerType = "TimePicker" And m_Date Then
-		xwp_Wheel.SelectRow2(0,Date,False)
-	Else if m_PickerType = "DatePicker" Then
+	
+	If isDateCreated Then
+	
+		If m_PickerType = "TimePicker" And m_ShowDate Then
+			xwp_Wheel.SelectRow2(0,Date,False)
+		Else if m_PickerType = "DatePicker" Then
 
-		Dim MinimumYear As Int = xwp_Wheel.GetItem(2,0).Value
+			Dim MinimumYear As Int = xwp_Wheel.GetItem(2,0).Value
 		
-		xwp_Wheel.SelectRow2(0,DateTime.GetMonth(Date) -1,False)
-		xwp_Wheel.SelectRow2(1,DateTime.GetDayOfMonth(Date) -1,False)
-		xwp_Wheel.SelectRow2(2,DateTime.GetYear(Date) - MinimumYear,False)
+			xwp_Wheel.SelectRow2(0,DateTime.GetMonth(Date) -1,False)
+			xwp_Wheel.SelectRow2(1,DateTime.GetDayOfMonth(Date) -1,False)
+			xwp_Wheel.SelectRow2(2,DateTime.GetYear(Date) - MinimumYear,False)
 		
-		ItemChange(0,DateTime.GetMonth(Date) -1,False)
-		ItemChange(1,DateTime.GetDayOfMonth(Date) -1,False)
-		ItemChange(2,DateTime.GetYear(Date) -1,False)
+			ItemChange(0,DateTime.GetMonth(Date) -1,False)
+			ItemChange(1,DateTime.GetDayOfMonth(Date) -1,False)
+			ItemChange(2,DateTime.GetYear(Date) -1,False)
 			
+		End If
+	
+	Else
+		
+		m_StartDate = Date
+		
 	End If
 	
 End Sub
 
 Public Sub getDate As Long
 	Dim Date As Long = 0
-	If m_PickerType = "TimePicker" And m_Date Then
+	If m_PickerType = "TimePicker" And m_ShowDate Then
 		Date = DateUtils.SetDateAndTime(DateTime.GetYear(xwp_Wheel.GetSelectedItem(0).Value),DateTime.GetMonth(xwp_Wheel.GetSelectedItem(0).Value),DateTime.GetDayOfMonth(xwp_Wheel.GetSelectedItem(0).Value),xwp_Wheel.GetSelectedItem(1).Value,xwp_Wheel.GetSelectedItem(2).Value,0)
 	Else if m_PickerType = "DatePicker" Then
 		
@@ -792,8 +808,81 @@ Public Sub getDate As Long
 		Dim Year As Int = xwp_Wheel.GetSelectedItem(2).Value
 		
 		Date = DateUtils.SetDate(Year,Month,Min(DateUtils.NumberOfDaysInMonth(Month,Year), Day))
+		
+		If m_MaxDate > 0 And DateUtils.IsSameDay(Date,m_MaxDate) = False And Date > m_MaxDate Then Date = m_MaxDate
+		If m_MinDate > 0 And DateUtils.IsSameDay(Date,m_MaxDate) = False And Date < m_MinDate Then Date = m_MinDate
+		
 	End If
 	Return Date
+End Sub
+
+'Call Refresh if you change something
+Public Sub getPickerType As String
+	Return m_PickerType
+End Sub
+
+Public Sub setPickerType(PickerType As String)
+	m_PickerType = PickerType
+End Sub
+
+'The separator between hour and minute is usually a colon ( : )
+Public Sub getShowTimeDivider As Boolean
+	Return m_TimeDivider
+End Sub
+
+Public Sub setShowTimeDivider(TimeDivider As Boolean)
+	m_TimeDivider = TimeDivider
+End Sub
+
+'Display time unit (12hour 05 min) can be changed with the HourShort and MinuteShort property
+Public Sub getShowTimeUnit As Boolean
+	Return m_TimeUnit
+End Sub
+
+Public Sub setShowTimeUnit(TimeUnit As Boolean)
+	m_TimeUnit = TimeUnit
+End Sub
+
+'Show the AM and PM column
+Public Sub getShowAMPM As Boolean
+	Return m_AMPM
+End Sub
+
+Public Sub setShowAMPM(AMPM As Boolean)
+	m_AMPM = AMPM
+End Sub
+
+'Show the date column in the TimePicker
+Public Sub getShowDate As Boolean
+	Return m_ShowDate
+End Sub
+
+Public Sub setShowDate(Show As Boolean)
+	m_ShowDate = Show
+End Sub
+
+Public Sub getMinuteShortText As String
+	Return m_MinuteShort
+End Sub
+
+Public Sub setMinuteShortText(MinuteShort As String)
+	m_MinuteShort = MinuteShort
+End Sub
+
+Public Sub getHourShortText As String
+	Return m_HourShort
+End Sub
+
+Public Sub setHourShortText(HourShort As String)
+	m_HourShort = HourShort
+End Sub
+
+Public Sub getMinuteSteps As Int
+	Return m_MinuteSteps
+End Sub
+
+Public Sub setMinuteSteps(MinuteSteps As Int)
+	m_MinuteSteps = MinuteSteps
 End Sub
 
 #Region ViewEvents
@@ -852,7 +941,7 @@ Private Sub xwp_Wheel_ItemChange(Column As Int,ListIndex As Int)
 		
 	Sleep(0)
 	
-	If m_PickerType = "TimePicker" And m_Date Then
+	If m_PickerType = "TimePicker" And m_ShowDate Then
 
 	Else if m_PickerType = "DatePicker" Then
 
@@ -931,10 +1020,10 @@ End Sub
 
 Private Sub SelectedTimeChanged
 	If xui.SubExists(mCallBack, mEventName & "_SelectedTimeChanged", 2) And m_PickerType = "TimePicker" Then
-		Dim str_1 As String = xwp_Wheel.GetSelectedItem(IIf(m_Date,1,0)).Value
-		Dim str_2 As String = xwp_Wheel.GetSelectedItem(IIf(m_Date,2,1)).Value
+		Dim str_1 As String = xwp_Wheel.GetSelectedItem(IIf(m_ShowDate,1,0)).Value
+		Dim str_2 As String = xwp_Wheel.GetSelectedItem(IIf(m_ShowDate,2,1)).Value
 		If IsNumber(str_1) And IsNumber(str_2) Then			
-		CallSub3(mCallBack, mEventName & "_SelectedTimeChanged",xwp_Wheel.GetSelectedItem(IIf(m_Date,1,0)).Value.As(Int),xwp_Wheel.GetSelectedItem(IIf(m_Date,2,1)).Value.As(Int))
+			CallSub3(mCallBack, mEventName & "_SelectedTimeChanged",xwp_Wheel.GetSelectedItem(IIf(m_ShowDate,1,0)).Value.As(Int),xwp_Wheel.GetSelectedItem(IIf(m_ShowDate,2,1)).Value.As(Int))
 		End If
 	End If
 End Sub
@@ -942,7 +1031,7 @@ End Sub
 Private Sub SelectedDateChanged
 	If xui.SubExists(mCallBack, mEventName & "_SelectedDateChanged", 1) Then
 		Dim Date As Long = 0
-		If m_PickerType = "TimePicker" And m_Date Then
+		If m_PickerType = "TimePicker" And m_ShowDate Then
 			Dim str_1 As String = xwp_Wheel.GetSelectedItem(0).Value
 			Dim str_2 As String = xwp_Wheel.GetSelectedItem(1).Value
 			If IsNumber(str_1) And IsNumber(str_2) Then
@@ -975,6 +1064,14 @@ End Sub
 
 Public Sub getThemeChangeTransition_None As String
 	Return "None"
+End Sub
+
+Public Sub getPickerType_TimePicker As String
+	Return "TimePicker"
+End Sub
+
+Public Sub getPickerType_DatePicker As String
+	Return "DatePicker"
 End Sub
 
 #End Region
