@@ -71,6 +71,8 @@ V1.17
 	-New all designer properties, now as get and set too
 	-New designer property descriptions
 	-BugFixes
+V1.18
+	-BugFix
 #End If
 
 #DesignerProperty: Key: ThemeChangeTransition, DisplayName: ThemeChangeTransition, FieldType: String, DefaultValue: Fade, List: None|Fade
@@ -489,7 +491,7 @@ Private Sub AddDatePicker
 	#End If
 	For i = MinimumYear To MaximumYear
 		tmp_lst2.Add(i)
-		'If i = DateTime.GetYear(DateTime.Now) Then StartIndex = i
+		'If i = DateTime.GetYear(m_StartDate) Then StartIndex = i
 	Next
 	xwp_Wheel.AddItems(tmp_lst2)
 	'Sleep(0)
@@ -503,8 +505,8 @@ Private Sub AddDatePicker
 	#If B4A
 	
 
-	Do While xwp_Wheel.GetSelectedItem(1).Value.As(Int) <> (DateTime.GetDayOfMonth(DateTime.Now))
-		xwp_Wheel.SelectRow(1,DateTime.GetDayOfMonth(DateTime.Now)-1,False)
+	Do While xwp_Wheel.GetSelectedItem(1).Value.As(Int) <> (DateTime.GetDayOfMonth(m_StartDate))
+		xwp_Wheel.SelectRow(1,DateTime.GetDayOfMonth(m_StartDate)-1,False)
 		Sleep(0)
 	Loop
 
@@ -778,7 +780,7 @@ Public Sub setDate(Date As Long)
 		Else if m_PickerType = "DatePicker" Then
 
 			Dim MinimumYear As Int = xwp_Wheel.GetItem(2,0).Value
-		
+
 			xwp_Wheel.SelectRow2(0,DateTime.GetMonth(Date) -1,False)
 			xwp_Wheel.SelectRow2(1,DateTime.GetDayOfMonth(Date) -1,False)
 			xwp_Wheel.SelectRow2(2,DateTime.GetYear(Date) - MinimumYear,False)
