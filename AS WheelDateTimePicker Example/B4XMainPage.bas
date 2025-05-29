@@ -18,6 +18,7 @@ Sub Class_Globals
 	Private AS_WheelDateTimePicker2 As AS_WheelDateTimePicker
 	Private AS_WheelDateTimePicker3 As AS_WheelDateTimePicker
 	Private AS_WheelDateTimePicker4 As AS_WheelDateTimePicker
+	Private AS_WheelDateTimePicker5 As AS_WheelDateTimePicker
 	Private xlbl_DateTime As B4XView
 
 End Sub
@@ -47,6 +48,7 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	AS_WheelDateTimePicker4.MinDate = DateTime.Now
 	
 	AS_WheelDateTimePicker4.Create
+	AS_WheelDateTimePicker5.Create
 
 	
 	'Sleep(0)

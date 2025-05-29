@@ -13,6 +13,6 @@ ModuleClosedNodes1=
 ModuleClosedNodes2=
 ModuleClosedNodes3=
 ModuleClosedNodes4=1
-NavigationStack=ASWheelPicker,ResizeWheels,408,6,AS_WheelDateTimePicker,Refresh,237,0,AS_WheelDateTimePicker,FillWheelPicker,350,0,ASWheelPicker,Refresh,919,0,ASWheelPicker,setRowHeightUnSelected,917,0,Visual Designer,frm_main.bal,-100,1,B4XMainPage,Class_Globals,12,0,AS_WheelDateTimePicker,Class_Globals,121,0,AS_WheelDateTimePicker,AddDate2TimePicker,497,0,B4XMainPage,B4XPage_Created,40,6
+NavigationStack=AS_WheelDateTimePicker,Refresh,237,0,ASWheelPicker,Refresh,919,0,ASWheelPicker,setRowHeightUnSelected,917,0,AS_WheelDateTimePicker,Class_Globals,121,0,B4XMainPage,Class_Globals,14,0,Visual Designer,frm_main.bal,-100,5,B4XMainPage,B4XPage_Created,44,6,AS_WheelDateTimePicker,AddDate2TimePicker,569,0,AS_WheelDateTimePicker,FillWheelPicker,408,6,ASWheelPicker,ResizeWheels,325,6
 SelectedBuild=0
 VisibleModules=3,1,2

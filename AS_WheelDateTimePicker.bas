@@ -73,6 +73,8 @@ V1.17
 	-BugFixes
 V1.18
 	-BugFix
+V1.19 (nicht veröffentlicht)
+	-Adjustments for AS_WheelPicker V3.25
 #End If
 
 #DesignerProperty: Key: ThemeChangeTransition, DisplayName: ThemeChangeTransition, FieldType: String, DefaultValue: Fade, List: None|Fade
@@ -346,7 +348,8 @@ Private Sub FillWheelPicker
 			Item.Text = NumberFormat(i,2,0)
 			Item.Value = i
 			Item.ItemTextProperties = xwp_Wheel.ItemTextProperties
-			If m_TimeUnit Or m_TimeDivider Then
+			'If m_TimeUnit Or m_TimeDivider Then
+			If m_TimeUnit Then
 				Item.ItemTextProperties.TextAlignment_Horizontal = "RIGHT"
 			Else
 				Item.ItemTextProperties.TextAlignment_Horizontal = "CENTER"
@@ -359,7 +362,7 @@ Private Sub FillWheelPicker
 		If m_TimeDivider Then
 			xwp_Wheel.SeperatorProperties.TextAlignment_Horizontal = "CENTER"
 			xwp_Wheel.SeperatorProperties.TextFont = xui.CreateDefaultBoldFont(18)
-			xwp_Wheel.SetSeperator(IIf(m_ShowDate,1,0),50dip,":")
+			xwp_Wheel.SetSeperator(IIf(m_ShowDate,1,0),MeasureTextWidth(":",xwp_Wheel.SeperatorProperties.TextFont) + 2dip,":")
 			xwp_Wheel.SeperatorProperties.TextFont = xui.CreateDefaultFont(12)
 		End If
 		
@@ -378,7 +381,8 @@ Private Sub FillWheelPicker
 				If m_TimeUnit Then
 					Item.ItemTextProperties.TextAlignment_Horizontal = "RIGHT"
 				else if  m_TimeDivider Then
-					Item.ItemTextProperties.TextAlignment_Horizontal = "LEFT"
+					'Item.ItemTextProperties.TextAlignment_Horizontal = "LEFT"
+					Item.ItemTextProperties.TextAlignment_Horizontal = "CENTER"
 				Else
 					Item.ItemTextProperties.TextAlignment_Horizontal = "CENTER"
 				End If
@@ -395,7 +399,7 @@ Private Sub FillWheelPicker
 	
 		'Space between Hour and Minutes
 		
-		If m_TimeUnit = True Then
+		If m_TimeUnit Then
 			xwp_Wheel.SeperatorProperties.TextAlignment_Horizontal = "LEFT"
 			xwp_Wheel.SetSeperator(IIf(m_ShowDate,1,0),MeasureTextWidth(" " & m_HourShort,xwp_Wheel.ItemTextProperties.TextFont) + 5dip," " & m_HourShort)
 			
@@ -405,8 +409,15 @@ Private Sub FillWheelPicker
 			
 			
 			xwp_Wheel.SetSeperator(IIf(m_ShowDate,2,1),MinuteSeperatorWidth," " & m_MinuteShort)
-		Else
+			
+		Else if m_TimeDivider Then
 '			xwp_Wheel.AddSeperator(1,10dip,"")
+			
+			If mBase.Width >= 300dip Then
+				xwp_Wheel.SetSeperator(-1,(mBase.Width/xwp_Wheel.NumberOfColumns)/2," ")
+				xwp_Wheel.SetSeperator(xwp_Wheel.NumberOfColumns -1,(mBase.Width/xwp_Wheel.NumberOfColumns)/2," ")
+			End If
+
 		End If
 	
 		'xwp_Wheel.SetWheelWidth(0,mBase.Width/2)
@@ -421,6 +432,14 @@ Private Sub FillWheelPicker
 		#If B4A
 		Sleep(0)
 		#End If
+		
+		If m_MinuteSteps > 1 Then
+			If m_Minute Mod m_MinuteSteps <> 0 Then
+				Dim rounded As Int = (Floor(m_Minute / m_MinuteSteps) + 1) * m_MinuteSteps
+				If rounded = 60 Then rounded = 0
+				m_Minute = rounded
+			End If
+		End If
 		
 		If m_AMPM And m_Hour > 12 Then
 			xwp_Wheel.SelectRow2(IIf(m_ShowDate,1,0),m_Hour-12,False)
