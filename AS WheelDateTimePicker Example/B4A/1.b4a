@@ -16,7 +16,7 @@ Module4=Starter
 NumberOfFiles=1
 NumberOfLibraries=6
 NumberOfModules=4
-Version=12.8
+Version=13.25
 @EndOfDesignText@
 #Region  Project Attributes 
 	#ApplicationLabel: B4A Example

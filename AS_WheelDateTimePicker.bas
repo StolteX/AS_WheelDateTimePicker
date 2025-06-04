@@ -73,7 +73,7 @@ V1.17
 	-BugFixes
 V1.18
 	-BugFix
-V1.19 (nicht veröffentlicht)
+V1.19
 	-Adjustments for AS_WheelPicker V3.25
 #End If
 
@@ -414,8 +414,15 @@ Private Sub FillWheelPicker
 '			xwp_Wheel.AddSeperator(1,10dip,"")
 			
 			If mBase.Width >= 300dip Then
-				xwp_Wheel.SetSeperator(-1,(mBase.Width/xwp_Wheel.NumberOfColumns)/2," ")
-				xwp_Wheel.SetSeperator(xwp_Wheel.NumberOfColumns -1,(mBase.Width/xwp_Wheel.NumberOfColumns)/2," ")
+				
+				If m_AMPM Then
+					xwp_Wheel.SetSeperator(xwp_Wheel.NumberOfColumns -1,(mBase.Width/xwp_Wheel.NumberOfColumns)/2," ")
+				Else
+					xwp_Wheel.SetSeperator(-1,(mBase.Width/xwp_Wheel.NumberOfColumns)/2," ")
+					xwp_Wheel.SetSeperator(xwp_Wheel.NumberOfColumns -1,(mBase.Width/xwp_Wheel.NumberOfColumns)/2," ")
+				End If
+				
+
 			End If
 
 		End If
